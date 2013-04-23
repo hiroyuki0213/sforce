@@ -1,0 +1,86 @@
+<apex:page controller="getIndex">
+<style>
+.processStart{
+    color:blue;
+    font-weight:bold;
+    text-decoration: blink;
+}
+.processEnd{
+    color:blue;
+    font-weight:bold;
+}
+</style>
+  <apex:form >
+      <apex:pageBlock title="オブジェクト検索">
+          <apex:outputPanel >
+              <b>API ： ラベル</b>&nbsp;&nbsp;&nbsp;
+              <apex:selectList multiselect="false" size="1" value="{!optionVal}" styleClass="selectList" >
+                <apex:selectoptions value="{!selectList}"/>
+              </apex:selectList>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              <apex:commandButton value="検索" styleClass="vfButton"/>
+              <apex:inputText styleClass="vfText"/>
+              &nbsp;&nbsp;※あいまい検索できません。
+              <br/><br/>
+              <b>ラベル ： API</b>&nbsp;&nbsp;&nbsp;
+              <apex:selectList multiselect="false" size="1" value="{!optionVal}" styleClass="selectJapList" >
+                <apex:selectoptions value="{!selectJapList}"/>
+              </apex:selectList> &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;<b>APIリンク集 ⇒ </b>
+                          <a href="http://www.salesforce.com/us/developer/docs/apexcode/index.htm">Apexリファレンス</a> &nbsp;&nbsp;
+                          <a href="http://www.salesforce.com/us/developer/docs/pages/index.htm">VFリファレンス</a> &nbsp;&nbsp;
+                          <a href="http://www.salesforce.com/us/developer/docs/apexcode/index_Left.htm#StartTopic=Content/apex_gov_limits.htm?SearchType=Stem">ガバナ制限</a>
+          </apex:outputPanel>
+      </apex:pageBlock>
+      <apex:pageBlock id="reInfo" >
+          <apex:outputPanel style="bgcolor:red">
+              <ul><b style="margin-left:-50px">オブジェクト名：<span style="font-size:16px">{!objectInfo.label}</span></b>
+                  <li>API参照名：{!objectInfo.Name}</li>
+                  <li>オブジェクトの種類：{!objectInfo.iscustom}</li>
+              </ul>
+          </apex:outputPanel>
+      </apex:pageblock>
+      <apex:actionFunction action="{!getField}" name="getField" reRender="reTable,reInfo" status="processStatus">
+         <apex:param Name="val" value=""/>
+       </apex:actionFunction>
+       <apex:actionStatus id="processStatus" startText="処理中...." startStyleClass="processStart" stopText="終了" stopStyleClass="processEnd"/>
+      <apex:pageBlock >
+          <apex:pageBlockTable id="reTable" value="{!viewList}" var="viewitem" >
+              <apex:column headerValue="項目種類" value="{!viewitem.iscustom}"/>
+               <apex:column headerValue="項目の表示ラベル" value="{!viewitem.label}"/>
+                <apex:column headerValue="API参照名" value="{!viewitem.name}"/>
+                 <apex:column headerValue="データ型" value="{!viewitem.type}"/>
+                  <apex:column headerValue="データの長さ" value="{!viewitem.length}"/>
+          </apex:pageblocktable>
+      </apex:pageblock>
+  </apex:form>
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"/>
+  <script type="text/javascript">
+      $('.selectList').change(function() {
+          var selectVal = $(this).val();
+          getField(selectVal);
+      }).change();
+      $('.selectJapList').change(function() {
+          var selectVal = $(this).val();
+          getField(selectVal);
+      });
+      $('.vfButton').bind('click',function(event) {
+          event.preventDefault();
+          var textVal = $(this).next().val();
+          var newStr = textVal.replace(/[^A-Za-z_1-9]/g,'');
+          var searchWord;
+          if(newStr.length != 0) {
+              if(newStr == textVal) {
+                   searchWord = textVal.toLowerCase();
+                   console.log('a');
+              } else {
+                  searchWord = textVal;
+                   console.log('b');
+              }
+          } else {
+              searchWord = textVal;
+              console.log('c');
+          }
+          getField(searchWord);
+      });
+                          
+   </script>
+</apex:page>
